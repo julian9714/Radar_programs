@@ -147,14 +147,14 @@ class variables_nc(object):
                        print 'El scale es: ', self.read_propname.scale_factor
                        print 'El offset es: ', self.read_propname.add_offset
                        
-                       self.values_nc = (self.values_nc + 32.0)*2.
-                       self.values_nc[self.values_nc < 0.] =\
-                               self.values_nc[self.values_nc < 0.] + 256.
+                       #self.values_nc = (self.values_nc + 32.0)*2.
+                       #self.values_nc[self.values_nc < 0.] =\
+                       #        self.values_nc[self.values_nc < 0.] + 256.
                        print 'Esta es una prueba uno', np.nanmax(self.values_nc)
                        print 'Esta es una prueba dos', np.nanmin(self.values_nc)
-                       self.values_nc[np.isnan(self.values_nc) == False] =\
-                               (self.values_nc[np.isnan(self.values_nc) == False]*\
-                               self.read_propname.scale_factor) + self.read_propname.add_offset
+                       #self.values_nc[np.isnan(self.values_nc) == False] =\
+                       #        (self.values_nc[np.isnan(self.values_nc) == False]*\
+                       #        self.read_propname.scale_factor) + self.read_propname.add_offset
                        print 'El minimo de la matrix scale: ',\
                                np.amin(self.values_nc[np.isnan(self.values_nc) == False])
                        print 'El maximo de la matrix scale: :',\

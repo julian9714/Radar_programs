@@ -12,32 +12,30 @@ import datetime as dt
 import numpy as np
 
 # Definicion de la ruta del archivo de las variables de entrada
-path_prop = '/home/julian/Dropbox/Tesis/tesis_progs/Reproyecta_radar/vertical/'
-path_data = '/home/julian/Radar/datos/20130627/'
+path_prop = '/home/julian/Dropbox/Radar_programs/Reprojection_Radar/vertical/'
+path_data = '/mnt/external_hdd/nc_data/RHI/20141017/'
+path_topo = '/home/julian/Dropbox/Radar_programs/Reprojection_Radar/vertical/'
 file_properties = 'reprojectradar_properties.ini'
 
 dic_inprop = r_pf.parsing_file(path_prop, file_properties).get_parsingpar()
 
 
-list_filesnc = np.array(sorted(glob.glob('/home/julian/Radar/datos/20130627/*RHIVol.nc')))
-#list_filesnc = np.array(['/home/julian/Radar/datos/20130627/SAN-20130627-112405-RHIVol.nc'])
+list_filesnc = np.array(sorted(glob.glob(path_data+'*RHIVol*.nc')))
+#list_filesnc = np.array(['/mnt/external_hdd/nc_data/RHI/20140426/SAN-20140426-034120-RHIVol-01.nc'])
 #list_filesnc = np.array(['/home/julian/Radar/datos/20130627/SAN-20130627-114130-RHIVol.nc'])
 #list_filesnc = np.array(['/home/julian/Desktop/nc/SAN-20150529-192049-RHIVol-001.nc'])
 
 
 # Se obtienen las variables del nc como una array a paritr del alrchivo parseado.
 str_namenc = np.array(['DBZH'])
-#str_namenc =np.array(str.split(dic_inprop['array_varnc'], ';'))
 
 #--------------------------------------------------------------------------------------------------
 # lectura de los puntos para la topografia
 #--------------------------------------------------------------------------------------------------
-path_top = '/home/julian/Dropbox/Tesis/tesis_progs/Reproyecta_radar/vertical/'
-lat_topo  = np.genfromtxt(path_top+'juli_lat.txt', dtype = float)
-lat_fix = np.genfromtxt(path_top+'juli_lathgt.txt', dtype = float)
-lon_topo  = np.genfromtxt(path_top+'juli_lon.txt', dtype = float)
-lon_fix = np.genfromtxt(path_top+'juli_lonhgt.txt', dtype = float)
-
+data_topo = np.fromfile(path_topo+'TopoZonal.dat', sep = '    ', dtype = float)
+n_topo    = data_topo[0]
+lon_topo  = (data_topo[1:])[0:n_topo]
+lon_fix   = (data_topo[1:])[n_topo:]
 #---------------------------------------------------------------------------------------------------
 # Definimos las varibales para hacer la reproyeccion.
 # Definicion del semi eje menor y el semi eje menor deacuerdo al wgs84
@@ -137,11 +135,12 @@ for ii in list_filesnc:
 
     color   =  [(43, 110, 255), (0, 57, 200), (66, 197, 212), (7, 240, 8),\
                 (11, 168, 29),\
-                (0, 117, 12), (255, 248, 0), (242, 174, 46), (222 , 115, 0), (255, 0, 0),\
+                (0, 117, 12), (255, 248, 0), (242, 174, 46), (242, 188, 107),\
+                (222 , 115, 0), (255, 0, 0),\
                 (158, 29, 0), (255, 117, 255), (252, 201, 255)]
         
     my_colorbar = mytools.make_cmap(colors=color, bit=True)  
-    lev = np.array([1, 5, 10, 15, 20, 25, 30, 40, 45, 55, 60, 65, 80])
+    lev = np.array([1, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 80])
     norm = colors.BoundaryNorm(boundaries=lev, ncolors=256)
 
     test_m[test_m < 0.0] = np.nan
@@ -172,8 +171,8 @@ for ii in list_filesnc:
                  c = 'k', ls = ':')
         ax1.plot((rep_dict['ang40.0']['s']) + 28., (rep_dict['ang40.0']['h'])[::-1], lw = 1.0,\
                  c = 'k', ls = ':')
-        ax1.plot(plot_topo_lon-18, plot_topo_hg[::-1], color = 'k')
-        ax1.fill_between(plot_topo_lon-18, plot_topo_hg[::-1], where=plot_topo_hg[::-1] >= 0,\
+        ax1.plot(plot_topo_lon-120, plot_topo_hg[::-1], color = 'k')
+        ax1.fill_between(plot_topo_lon-120., plot_topo_hg[::-1], where=plot_topo_hg[::-1] >= 0,\
                          facecolor='gray', interpolate=True)
         cbar = plt.colorbar(img, fraction=0.1, pad=0.1, orientation = 'horizontal',\
                             label = 'Reflectividad $[dBZ]$')
