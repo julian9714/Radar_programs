@@ -1,0 +1,20 @@
+Git es una estarategia de repositorio.
+
+- Flujo de información.
+1) Bajo el repositorio:
+    Para esto puedo hacer un clone (Si el repositorio no exisste en local).
+    O pull ( Si el repositorio ya existía en local y quiero actualizar con lo que
+    hay en el remoto.
+
+2) Se hacen los cambios de los archivos en la carpeta de trabajo local.
+3) Se suben los cambios que se hayan hecho de manera local al repositorio remoto.
+
+
+COMANDOS BÁSICOS.
+
+git init (Inicia el servicio de git ne la carpeta local)
+git add name_archivo (Adiciona al repositorio un archivo que se cree en local)
+git add . (Adiciona todos los cambios que se hayan hecho de forma recursiva en la carpeta local)
+git status (Muestra los cambios)
+git status -s (Muestra los cambios que se hayan hecho mode short)
+
