@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
-sys.path.append('/home/julian/Dropbox/Radar_programs/QPE/scripts_python/modulos_generales/')
+sys.path.append('/home/julian/Radar_programs/QPE/scripts_python/modulos_generales/')
 from useful_toolbox import *
 import numpy as np
 import datetime as dt 
@@ -12,25 +12,16 @@ import matplotlib.dates as md
 import pprint, pickle
 import pandas as pd
 import glob
+import modulos_qpepolares as qpepolar
 
-path_pkldata         = '/home/julian/Radar/QPE_pkl/'
-str_pol              = '201'
-str_est              = '201'
-str_disdro           = '77'
-res_ini              = '5MIN'
-pklfile_polarimetric = str_pol+'_polarimetric.pkl'
-pklfile_estacion     = str_est+'_precipitation.pkl'
-pklfile_disdro       = str_disdro+'_disdrometro.pkl'
-write_pklajust       = 'YES'
-grap_pptvspolar      = 'NO'
-grap_exppolar        = 'YES'
+path_pkldata     = '/mnt/external_hdd/Radar_data/QPE_pkl/'
+name_stfiles     = 'estaciones_pkl_todaspaper.csv'
+path_stations    = '/mnt/external_hdd/Radar_data/meta_informacion/'
+path_plots       = '/home/julian/Dropbox/QPE/resultados/resultados_zr/'
+source_str       = 'SIATA_Vaisala'
+#how_resolution   = 'Rolling'
+#type_fig_str     = 'Contour'
+#main_name_plot   = 'Contour'
 
-polar_data     = open_pklfiles(path_pkldata = path_pkldata+pklfile_polarimetric)
-est_data       = open_pklfiles(path_pkldata = path_pkldata+pklfile_estacion)
-disdro_data    = open_pklfiles(path_pkldata = path_pkldata+pklfile_disdro)
-
-# Buscamos que las fechas en las que existen coincidentes segun la resolucion del radar
-result_aux     = polar_data.join(disdro_data, how = 'inner')
-coincidentes   = result_aux.join(est_data, how = 'inner')
-
-julian
+polar_data = qpepolar.polar_QPE(path_pkldata, name_stfiles, path_stations)
+test       = polar_data.finder_station(source = source_str)

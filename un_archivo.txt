@@ -1,1 +1,7 @@
-"Este es un archivo de prueba"
+Actividades 05 de Noviembre.
+-----------------------------------------------------------------
+1. Hacer las graficas comparativas de las polares. --------- si
+2. Hacer los ajustes con las variables polares. ------------
+3. Mirar como dan los ajustes (multi y polares). -----------
+4. Correr el algoritmo de incertidumbre. -------------------
+5. Correr algunos indices de error, ver cómo mejorar. ------

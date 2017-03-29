@@ -87,5 +87,3 @@ def adjust_by_bins(N_bins, serie_x, serie_y):
                     'q25':q25_bin, 'q75':q75_bin, 'q90':q90_bin, 'mad':mad_bin, 'mean':mean_bin} 
 
     return dict_res_bins
-
-  

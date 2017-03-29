@@ -65,16 +65,16 @@ class variables_nc(object):
 
     def print_att (self, display_att = 'NO'):
         f = netCDF4.Dataset(self.folder_nc, 'r')
-        self.val_fixedangle = int(np.round((f.variables['fixed_angle'][:]) * 10.))
+        self.val_elevacion = int(np.round(np.amax(f.variables['elevation'][:]) * 10.))
         self.val_rango = int(np.ceil((np.amax(f.variables['range'][:]))/1000.0))
         f.close()
         
     def getvariables_nc(self, key_variables):
         self.key_variables = key_variables
 
-        if ( self.val_rango == self.range_bound) & (self.val_fixedangle ==  self.elev_bound):
+        if ( self.val_rango == self.range_bound) & (self.val_elevacion ==  self.elev_bound):
             print 'Entre al condicional'
-            #print self.folder_nc
+            print self.folder_nc
             nc = netCDF4.Dataset(self.folder_nc, 'r')
             self.name_varnc = np.array(['latitude','longitude','altitude',\
                 'azimuth','elevation','range','sweep_number','sweep_mode',\
@@ -89,7 +89,7 @@ class variables_nc(object):
             
             self.resul_nedcdf = {} 
             for ii in self.name_varnc:
-                #print 'La variable en el netcdf es :', ii
+                print 'La variable en el netcdf es :', ii
                 try:
                     self.read_propname = nc.variables[ii]
                     self.resul_nedcdf.update({ii: {}})
@@ -98,8 +98,13 @@ class variables_nc(object):
                         self.attprop = self.read_propname.__dict__[jj]
                         self.resul_nedcdf[ii].update({jj:self.attprop})
                     try:
-                        self.values_nc[self.values_nc == self.read_propname._FillValue] = -999.0
-                        #self.values_nc[self.values_nc != -999.0] = self.values_nc[self.values_nc != -999.0]*self.read_propname.scale_factor + self.read_propname.add_offset
+                        #self.values_nc[self.values_nc == self.read_propname._FillValue] = -999.0
+                        #self.values_nc = (self.values_nc + 32.0)*2.
+                        #self.values_nc[self.values_nc < 0.] =\
+                        #        self.values_nc[self.values_nc < 0.] + 256.
+                        #self.values_nc[np.isnan(self.values_nc) == False] =\
+                        #        (self.values_nc[np.isnan(self.values_nc) == False]*\
+                        #         self.read_propname.scale_factor) + self.read_propname.add_offset
                         print 'Se hizo el calculo de la matrix para '+ii
                         self.resul_nedcdf[ii].update({'Values': self.values_nc})
                         print 'Se hizo el calculo de la matrix el test '+ii
@@ -111,69 +116,11 @@ class variables_nc(object):
                     print 'La variable '+ii+'no se puede leer del netcdf'
             nc.close()                                                   
             return self.resul_nedcdf                                     
-        
-        if (self.val_fixedangle == 0) | (self.val_fixedangle == 900) | (self.val_fixedangle == 1800) | (self.val_fixedangle == 2700):
-           print 'Estoy leyendo un archivo vertical'
-           print self.folder_nc
-           nc = netCDF4.Dataset(self.folder_nc, 'r')
-           self.name_varnc = np.array(['latitude','longitude','altitude',\
-               'azimuth','elevation','range','sweep_number','sweep_mode',\
-                   'fixed_angle','sweep_start_ray_index','sweep_end_ray_index'])
-       
-           if key_variables[0] == 'ALL':
-               self.name_varnc = np.array([])
-               for ij in nc.variables:
-                   self.name_varnc = np.append(self.name_varnc, ij)
-           else:
-               self.name_varnc = np.append(self.name_varnc, key_variables)
-           
-           self.resul_nedcdf = {} 
-           for ii in self.name_varnc:
-               #print 'La variable en el netcdf es :', ii
-               try:
-                   self.read_propname = nc.variables[ii]
-                   self.resul_nedcdf.update({ii: {}})
-                   self.values_nc = self.read_propname[:]
-                   for jj in self.read_propname.__dict__:
-                       self.attprop = self.read_propname.__dict__[jj]
-                       self.resul_nedcdf[ii].update({jj:self.attprop})
-                   try:
-                       self.values_nc[self.values_nc == self.read_propname._FillValue] = np.nan
-                       print 'Vol a hacer el calculo de la matrix'
-                       print 'El minimo de la matrix org: ',\
-                               np.amin(self.values_nc[np.isnan(self.values_nc) == False])
-                       print 'El maximo de la matrix org: ',\
-                               np.amax(self.values_nc[np.isnan(self.values_nc) == False])
-                       print 'El scale es: ', self.read_propname.scale_factor
-                       print 'El offset es: ', self.read_propname.add_offset
-                      
-                       ## Las siguientes tres lineas se descomentan para archivos viejos
-                       #self.values_nc = (self.values_nc + 32.0)*2.
-                       #self.values_nc[self.values_nc < 0.] =\
-                       #        self.values_nc[self.values_nc < 0.] + 256.
-                       print 'Esta es una prueba uno', np.nanmax(self.values_nc)
-                       print 'Esta es una prueba dos', np.nanmin(self.values_nc)
-                       #self.values_nc[np.isnan(self.values_nc) == False] =\
-                       #        (self.values_nc[np.isnan(self.values_nc) == False]*\
-                       #        self.read_propname.scale_factor) + self.read_propname.add_offset
-                       print 'El minimo de la matrix scale: ',\
-                               np.amin(self.values_nc[np.isnan(self.values_nc) == False])
-                       print 'El maximo de la matrix scale: :',\
-                               np.amax(self.values_nc[np.isnan(self.values_nc) == False])
-
-                       print 'Se hizo el calculo de la matrix para '+ii
-                       self.resul_nedcdf[ii].update({'Values': self.values_nc})
-                       #print 'Se hizo el calculo de la matrix el test '+ii
-          
-                   except:
-                       #print 'No se le modifica la variables con sacale y offset'
-                       self.resul_nedcdf[ii].update({'Values': self.values_nc})
-               except:
-                   print 'La variable '+ii+'no se puede leer del netcdf'
-           nc.close()                                                   
-           return self.resul_nedcdf                                     
-
+        else:                                                            
+            print 'El rango y la elevacion no son las especificadas'     
+                                                                         
 print 'Compile bien'                                                     
+                                                                         
 ##path_final = unzip_nc(path_file, path_out, aux_folder)                 
 ##test_class = variables_nc(path_final,elev_bound, range_bound)          
 ##jola = test_class.getvariables_nc(['DBZH'])                            

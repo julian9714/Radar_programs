@@ -13,12 +13,11 @@ import numpy as np
 
 # Definicion de la ruta del archivo de las variables de entrada
 path_prop = '/mnt/external_hdd/Radar_programs/Reprojection_Radar/vertical/'
-path_data = '/mnt/external_hdd/nc_data/RHI/20141017/'
+path_data = '/mnt/external_hdd/nc_data/RHI/20130627/'
 path_topo = '/mnt/external_hdd/Radar_programs/Reprojection_Radar/vertical/'
 file_properties = 'reprojectradar_properties.ini'
 
 dic_inprop = r_pf.parsing_file(path_prop, file_properties).get_parsingpar()
-
 
 list_filesnc = np.array(sorted(glob.glob(path_data+'*RHIVol*.nc')))
 #list_filesnc = np.array(['/mnt/external_hdd/nc_data/RHI/20140426/SAN-20140426-034120-RHIVol-01.nc'])
@@ -43,6 +42,7 @@ semi_eje_menor = 6356752.314
 semi_eje_mayor = 6378137.000
 #----------------------------------------------------------------------------------------------------
 for ii in list_filesnc:
+    print ii
     str_dateUTC   = (((ii.split('SAN-'))[1]).split('-RHIVol'))[0]
     datelocal     = (dt.datetime.strptime(str_dateUTC, '%Y%m%d-%H%M%S')) - dt.timedelta(hours = 5)
     str_datelocal = dt.datetime.strftime(datelocal, '%Y%m%d-%H%M%S')
@@ -55,7 +55,7 @@ for ii in list_filesnc:
 
     lat_rad = dic_varnc['latitude']['Values'] * (math.pi/180.0)
     lon_rad = dic_varnc['longitude']['Values'] * (math.pi/180.0)
-# radio de la tierra en la latitud del radar
+    # radio de la tierra en la latitud del radar
     radio = 1/(math.sqrt((math.cos(lat_rad)**2.0)/(semi_eje_mayor**2.0)+\
             (math.sin(lat_rad)**2.0)/(semi_eje_menor**2.0)))
     ra_e = (4./3.)*radio
@@ -91,7 +91,7 @@ for ii in list_filesnc:
     grid_z0  = griddata(point, var_all, (X, Y), method='nearest')
     print 'El maximo del reproyectado es: ', np.nanmax(grid_z0)
 
-    angles   = np.array([1.0, 10.0, 40.0])
+    angles   = np.array([0.0, 1.0, 10.0, 40.0])
     rep_dict = {}
     for ang in angles:
         h = ((ra_e + hr)**2.0 + range_s**2.0 + (2.*(ra_e + hr)*range_s*np.sin(ang*np.pi/180.0)))**\
@@ -159,12 +159,13 @@ for ii in list_filesnc:
         ax1.tick_params(axis='y', labelsize=labelsize)
         ax1.set_xlabel('Longitud', fontsize = labelsize)
         ax1.set_ylabel('Altura $[km]$', fontsize = labelsize)
-        ax1.set_xlim(0.0, 119.)
-        ax1.set_ylim(0.0, 18.0)
-        plt.xticks(aux, map(lambda x : str('%0.2f'%x),ax_deg[::-1]))
+        ax1.set_xlim(60.0, 119.)
+        ax1.set_ylim(0.0, 13.0)
+        plt.xticks(aux[3:], (map(lambda x : str('%0.2f'%x),ax_deg[::-1]))[3:])
         img = ax1.imshow(test_m, aspect='auto', origin='lower', cmap = my_colorbar, norm = norm,\
                          extent=(X.min(), X.max(), Y.min(), Y.max()))
         ax1.plot(aux, np.array([2]*7), alpha = 0)
+        ax1.plot(np.array([101]*28), np.arange(0.0, 14.0, 0.5), color = 'k', lw = 1.2, ls = '--')
         ax1.plot(rep_dict['ang0.0']['s'], (rep_dict['ang0.0']['h'])[::-1], lw = 1.0, c = 'k', ls = ':')
         ax1.plot(rep_dict['ang1.0']['s'], (rep_dict['ang1.0']['h'])[::-1], lw = 1.0, c = 'k', ls = ':')
         ax1.plot(rep_dict['ang10.0']['s'], (rep_dict['ang10.0']['h'])[::-1], lw = 1.0,\
@@ -178,4 +179,4 @@ for ii in list_filesnc:
                             label = 'Reflectividad $[dBZ]$')
         cbar.ax.tick_params(labelsize=labelsize)
         
-        plt.savefig('/home/julian/Dropbox/Tesis/tesis_progs/Reproyecta_radar/vertical/imagenes_nico/Reflectividad_'+str_datelocal+'_RHI_AZ'+str(int((dic_varnc['fixed_angle']['Values'])[0]))+'.png', format = 'png', dpi = 300)
+        plt.savefig('/mnt/external_hdd/Radar_results/resultado_RHI/Reflectividad_'+str_datelocal+'_RHI_AZ'+str(int((dic_varnc['fixed_angle']['Values'])[0]))+'.png', format = 'png', dpi = 300)
