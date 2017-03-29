@@ -19,3 +19,4 @@ git status (Muestra los cambios)
 git status -s (Muestra los cambios que se hayan hecho mode short)
 
 Creacion de branches
+hoa lindos
